@@ -1,0 +1,22 @@
+name: Build VoiceInk (local, ad-hoc signed)
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain info
+        run: |
+          xcodebuild -version
+          swift --version
+          sw_vers
+      - name: Build
+        run: make local LOCAL_CODESIGN_IDENTITY=-
+      - name: Package
+        run: ditto -c -k --keepParent "$HOME/Downloads/VoiceInk.app" VoiceInk.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VoiceInk-app
+          path: VoiceInk.zip
